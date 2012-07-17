@@ -28,7 +28,7 @@ namespace NHibernate.Search.Store
             {
                 bool create = !IndexReader.IndexExists(indexDir.FullName);
                 indexName = indexDir.FullName;
-                directory = FSDirectory.GetDirectory(indexName, create);
+                directory = FSDirectory.Open(indexDir);
                 if (create)
                 {
                     IndexWriter iw = new IndexWriter(directory, new StandardAnalyzer(), create);
