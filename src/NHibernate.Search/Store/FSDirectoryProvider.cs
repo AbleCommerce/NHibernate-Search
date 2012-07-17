@@ -29,6 +29,8 @@ namespace NHibernate.Search.Store
                 bool create = !IndexReader.IndexExists(indexDir.FullName);
                 indexName = indexDir.FullName;
                 directory = FSDirectory.Open(indexDir);
+                LockFactory lockFactory = DirectoryProviderHelper.CreateLockFactory(indexDir, properties);
+                directory.SetLockFactory(lockFactory);
                 if (create)
                 {
                     IndexWriter iw = new IndexWriter(directory, new StandardAnalyzer(), create);

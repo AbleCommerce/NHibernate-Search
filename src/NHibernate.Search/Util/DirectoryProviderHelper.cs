@@ -1,6 +1,8 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.IO;
+using Lucene.Net.Store;
 using NHibernate.Search.Impl;
 using NHibernate.Util;
 
@@ -107,6 +109,36 @@ namespace NHibernate.Search
 
             indexDir = new DirectoryInfo(Path.Combine(indexDir.FullName, indexName));
             return indexDir;
+        }
+
+        /// <summary>
+        /// Creates a LockFactory as selected in the configuration for the DirectoryProvider.
+        /// The SimpleFSLockFactory and NativeFSLockFactory need a File to know
+        /// where to stock the filesystem based locks; other implementations ignore this parameter.
+        /// </summary>
+        /// <param name="indexDir">the directory to use to store locks, if needed by implementation</param>
+        /// <param name="properties">the configuration of current DirectoryProvider</param>
+        /// <returns>the LockFactory as configured, or a SimpleFSLockFactory in case of configuration errors or as a default.</returns>
+        public static LockFactory CreateLockFactory(DirectoryInfo indexDir, IDictionary<string, string> dirConfiguration)
+        {
+            string lockFactoryName;
+            if (dirConfiguration.ContainsKey("locking_strategy")) lockFactoryName = dirConfiguration["locking_strategy"];
+            else lockFactoryName = "simple";
+            switch (lockFactoryName)
+            {
+                case "simple":
+                    return new SimpleFSLockFactory(indexDir);
+                case "native":
+                    return new NativeFSLockFactory(indexDir);
+                case "single":
+                    return new SingleInstanceLockFactory();
+                case "none":
+                    return new NoLockFactory();
+                default:
+                    string message = string.Format("Invalid configuration setting for option locking_strategy \"{0}\"; option ignored!", lockFactoryName);
+                    log.Warn(message);
+                    return new SimpleFSLockFactory(indexDir);
+            }
         }
 
         private static bool HasWriteAccess(DirectoryInfo indexDir)

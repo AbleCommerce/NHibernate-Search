@@ -91,6 +91,8 @@ namespace NHibernate.Search.Store
 
                 indexName = indexDir.FullName;
                 directory = FSDirectory.GetDirectory(indexName, create);
+                LockFactory lockFactory = DirectoryProviderHelper.CreateLockFactory(indexDir, properties);
+                directory.SetLockFactory(lockFactory);
 
                 if (create)
                 {

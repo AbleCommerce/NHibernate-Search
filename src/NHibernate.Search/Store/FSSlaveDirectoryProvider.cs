@@ -131,6 +131,8 @@ namespace NHibernate.Search.Store
                 DirectoryInfo subDir = new DirectoryInfo(Path.Combine(indexName, "1"));
                 create = !IndexReader.IndexExists(subDir.FullName); 
                 directory1 = FSDirectory.GetDirectory(subDir.FullName, create);
+                LockFactory lockFactory = DirectoryProviderHelper.CreateLockFactory(subDir, properties);
+                directory1.SetLockFactory(lockFactory);
                 if (create)
                 {
                     log.DebugFormat("Initialize index: '{0}'", subDir.FullName);
@@ -141,6 +143,8 @@ namespace NHibernate.Search.Store
                 subDir = new DirectoryInfo(Path.Combine(indexName, "2"));
                 create = !IndexReader.IndexExists(subDir.FullName); 
                 directory2 = FSDirectory.GetDirectory(subDir.FullName, create);
+                lockFactory = DirectoryProviderHelper.CreateLockFactory(subDir, properties);
+                directory2.SetLockFactory(lockFactory);
                 if (create)
                 {
                     log.DebugFormat("Initialize index: '{0}'", subDir.FullName);
