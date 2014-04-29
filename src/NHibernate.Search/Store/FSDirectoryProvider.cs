@@ -31,11 +31,17 @@ namespace NHibernate.Search.Store
                 directory = FSDirectory.Open(indexDir);
                 LockFactory lockFactory = DirectoryProviderHelper.CreateLockFactory(indexDir, properties);
                 directory.SetLockFactory(lockFactory);
+
                 if (create)
                 {
-                    IndexWriter iw = new IndexWriter(directory, new StandardAnalyzer(), create);
+                    IndexWriter iw = new IndexWriter(directory,
+                                                     new StandardAnalyzer(),
+                                                     create,
+                                                     new KeepOnlyLastCommitDeletionPolicy(),
+                                                     IndexWriter.MaxFieldLength.UNLIMITED);
                     iw.Close();
                 }
+
                 //searchFactory.RegisterDirectoryProviderForLocks(this);
             }
             catch (IOException e)
